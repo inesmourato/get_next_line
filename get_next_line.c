@@ -6,107 +6,84 @@
 /*   By: ibravo-m <ibravo-m@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:27:05 by ibravo-m          #+#    #+#             */
-/*   Updated: 2024/05/21 14:47:45 by ibravo-m         ###   ########.fr       */
+/*   Updated: 2024/05/28 15:17:55 by ibravo-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(char *str)
-{
-	size_t	i;
+static char	*fill_buffer(int fd, char *left_c, char *buffer);
 
-	i = 0;
-	if (!str)
-		return (0);
-	while (str[i] && str[i] != '\n')
-		i++;
-	return (i + (str[i] == '\n'));
-}
-char	*ft_strjoin(char *s1, char *s2)
-{
-	size_t	i;
-	size_t	j;
-	char	*new_str;
-
-	i = 0;
-	j = 0;
-	new_str = malloc(ft_strlen(s1) + ft_strlen(s2) + 1 * sizeof(char));
-	if (!new_str)
-		return (NULL);
-	while (s1 && s1[j])
-		new_str[i++] = s1[j++];
-	j = 0;
-	while (s2 && s2[j] && s2[j] != '\n')
-		new_str[i++] = s2[j++];
-	if (s2[j] == '\n')
-		new_str[i++] = '\n';
-	new_str[i] = '\0';
-	free(s1);
-	return (new_str);
-}
-int	increment(char *buffer)
-{
-	int	new_line;
-	int	i;
-	int	j;
-
-	new_line = 0;
-	i = 0;
-	j = 0;
-	while (buffer[i])
-	{
-		if (new_line)
-			buffer[j++] = buffer[i];
-		if (buffer[i] == '\n')
-			new_line = 1;
-		buffer[i++] = '\0';
-	}
-	return (new_line);
-}
 char	*get_next_line(int fd)
 {
-	static char	buffer[BUFFER_SIZE + 1];
-	char		*str;
+	char	*buffer;
+	char	*left_c;
+	char	*text;
 
-	str = NULL;
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buffer)
 		return (NULL);
-	if (!buffer[0])
-		read(fd, buffer, BUFFER_SIZE);
-	while (buffer[0])
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
 	{
-		str = ft_strjoin(str, buffer);
-		if (!str)
-			return (NULL);
-		if (increment(buffer) == 1)
-			break ;
-		if (read(fd, buffer, BUFFER_SIZE) < 0)
-		{
-			free(str);
-			return (NULL);
-		}
+		free(left_c);
+		free(buffer);
+		left_c = NULL;
+		buffer = NULL;
+		return (NULL);
 	}
-	return (str);
+	text = fill_buffer(fd, left_c, buffer);
+	free(buffer);
+	buffer = NULL;
+	if (!text)
+		return (NULL);
+	left_c = set_line(text);
+	return (text);
 }
 
-int	main(void)
+static char	*fill_buffer(int fd, char *left_c, char *buffer)
 {
-	char *line;
+	ssize_t	b_read;
+	char	*tmp;
 
-	FILE *file;
-	file = fopen("test.txt", "r");
-	if (!file)
+	b_read = 1;
+	while (b_read > 0)
 	{
-		perror("error opening file");
-		return (1);
+		b_read = read(fd, buffer, BUFFER_SIZE);
+		if (b_read == -1)
+		{
+			free(left_c);
+			return (NULL);
+		}
+		else if (b_read == 0)
+			break ;
+		buffer[b_read] = 0;
+		if (!left_c)
+			left_c = ft_strdup("");
+		tmp = left_c;
+		left_c = ft_strjoin(tmp, buffer);
+		free(tmp);
+		tmp = NULL;
+		if (ft_strchr(buffer, '\n'))
+			break ;
 	}
-	while ((line = get_next_line(fileno(file))) != NULL)
+	return (left_c);
+}
+
+static char	*set_line(char *line_buffer)
+{
+	ssize_t i;
+	char *left_c;
+
+	while (line_buffer[i] != '\n' || line_buffer[i] != '\0')
+		i++;
+	if (line_buffer[i] == 0 || line_buffer[i + 1] == 0)
+		return (NULL);
+	left_c = ft_substr(line_buffer, i + 1, ft_strlen(line_buffer) - i);
+	if (*left_c == 0)
 	{
-		printf("%s", line);
-		free(line);
+		free(left_c);
+		return (NULL);
 	}
-	printf("\nBUFFER_SIZE: %i\n", BUFFER_SIZE);
-	fclose(file);
-	return (0);
+	left_c[i + 1] = 0;
+	return (left_c);
 }
