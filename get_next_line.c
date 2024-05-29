@@ -6,28 +6,28 @@
 /*   By: ibravo-m <ibravo-m@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 10:27:05 by ibravo-m          #+#    #+#             */
-/*   Updated: 2024/05/28 15:17:55 by ibravo-m         ###   ########.fr       */
+/*   Updated: 2024/05/29 15:30:35 by ibravo-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 static char	*fill_buffer(int fd, char *left_c, char *buffer);
+static char	*set_line(char *line_buffer);
 
 char	*get_next_line(int fd)
 {
-	char	*buffer;
-	char	*left_c;
-	char	*text;
+	char		*buffer;
+	static char	*left_c;
+	char		*text;
 
+	left_c = NULL;
 	buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buffer)
 		return (NULL);
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 	{
-		free(left_c);
 		free(buffer);
-		left_c = NULL;
 		buffer = NULL;
 		return (NULL);
 	}
@@ -56,13 +56,12 @@ static char	*fill_buffer(int fd, char *left_c, char *buffer)
 		}
 		else if (b_read == 0)
 			break ;
-		buffer[b_read] = 0;
+		buffer[b_read] = '\0';
 		if (!left_c)
 			left_c = ft_strdup("");
 		tmp = left_c;
 		left_c = ft_strjoin(tmp, buffer);
 		free(tmp);
-		tmp = NULL;
 		if (ft_strchr(buffer, '\n'))
 			break ;
 	}
@@ -71,12 +70,13 @@ static char	*fill_buffer(int fd, char *left_c, char *buffer)
 
 static char	*set_line(char *line_buffer)
 {
-	ssize_t i;
-	char *left_c;
+	ssize_t	i;
+	char	*left_c;
 
-	while (line_buffer[i] != '\n' || line_buffer[i] != '\0')
+	i = 0;
+	while (line_buffer[i] != '\n' && line_buffer[i] != '\0')
 		i++;
-	if (line_buffer[i] == 0 || line_buffer[i + 1] == 0)
+	if (line_buffer[i] == 0 && line_buffer[i + 1] == 0)
 		return (NULL);
 	left_c = ft_substr(line_buffer, i + 1, ft_strlen(line_buffer) - i);
 	if (*left_c == 0)
@@ -84,6 +84,15 @@ static char	*set_line(char *line_buffer)
 		free(left_c);
 		return (NULL);
 	}
-	left_c[i + 1] = 0;
 	return (left_c);
 }
+
+// int	main(void)
+// {
+// 	int fd;
+// 	char *line;
+// 	fd = open("test.txt", O_RDONLY);
+// 	line = get_next_line(fd);
+// 	printf("%s", line);
+// 	free(line);
+// }

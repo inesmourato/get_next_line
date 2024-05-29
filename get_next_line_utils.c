@@ -6,7 +6,7 @@
 /*   By: ibravo-m <ibravo-m@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/28 15:18:32 by ibravo-m          #+#    #+#             */
-/*   Updated: 2024/05/28 15:25:15 by ibravo-m         ###   ########.fr       */
+/*   Updated: 2024/05/29 15:22:07 by ibravo-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,10 +60,14 @@ char	*ft_strchr(const char *str, int c)
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	size_t len1;
-	size_t len2;
-	char *dest;
+	size_t	len1;
+	size_t	len2;
+	char	*dest;
+	unsigned int	i;
+	unsigned int	j;
 
+	i = 0;
+	j = 0;
 	len1 = ft_strlen(s1);
 	len2 = ft_strlen(s2);
 	if (!s1 || !s2)
@@ -71,8 +75,37 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	dest = malloc((len1 + len2 + 1) * sizeof(char));
 	if (!dest)
 		return (NULL);
-	// ft_strlcpy(dest, s1, len1 + 1);
-	// ft_strlcat(dest, s2, (len1 + len2 + 1));
-        
+	while (s1[j])
+		dest[i++] = s1[j++];
+	j = 0;
+	while (s2[j] && s2[j] != '\n')
+		dest[i++] = s2[j++];
+        if(s2[j] == '\n')
+                dest[i++] = '\n';
+	dest[i] = '\0';
 	return (dest);
+}
+
+char	*ft_substr(char const *s, unsigned int start, size_t len)
+{
+	char *little;
+	size_t i;
+
+	i = 0;
+	if (!s)
+		return (NULL);
+	if (start > ft_strlen(s))
+		return (ft_strdup(""));
+	if (len > ft_strlen(s + start))
+		len = ft_strlen(s + start);
+	little = malloc((len + 1) * sizeof(char));
+	if (!little)
+		return (NULL);
+	while (i < len)
+	{
+		little[i] = s[start + i];
+		i++;
+	}
+        little[i] = '\0';
+	return (little);
 }
