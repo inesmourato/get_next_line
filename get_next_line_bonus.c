@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ibravo-m <ibravo-m@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/21 10:27:05 by ibravo-m          #+#    #+#             */
-/*   Updated: 2024/06/04 10:37:00 by ibravo-m         ###   ########.fr       */
+/*   Created: 2024/06/04 10:56:14 by ibravo-m          #+#    #+#             */
+/*   Updated: 2024/06/04 10:59:47 by ibravo-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static char	*fill_buffer(int fd, char *left_c, char *buffer);
 static char	*set_line(char *line_buffer);
@@ -19,26 +19,26 @@ static char	*ft_strchr(char *str, int c);
 char	*get_next_line(int fd)
 {
 	char		*buffer;
-	static char	*left_c;
+	static char	*left_c[MAX_FD];
 	char		*text;
 
 	buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (fd < 0 || BUFFER_SIZE <= 0)
 	{
 		free(buffer);
-                free(left_c);
-                left_c = NULL;
+		free(left_c[fd]);
+		left_c[fd] = NULL;
 		buffer = NULL;
 		return (NULL);
 	}
 	if (!buffer)
 		return (NULL);
-	text = fill_buffer(fd, left_c, buffer);
+	text = fill_buffer(fd, left_c[fd], buffer);
 	free(buffer);
 	buffer = NULL;
 	if (!text)
 		return (NULL);
-	left_c = set_line(text);
+	left_c[fd] = set_line(text);
 	return (text);
 }
 
@@ -64,7 +64,7 @@ static char	*fill_buffer(int fd, char *left_c, char *buffer)
 		tmp = left_c;
 		left_c = ft_strjoin(tmp, buffer);
 		free(tmp);
-                tmp = NULL;
+		tmp = NULL;
 		if (ft_strchr(buffer, '\n'))
 			break ;
 	}
@@ -87,7 +87,7 @@ static char	*set_line(char *line_buffer)
 		free(left_c);
 		left_c = NULL;
 	}
-        line_buffer[i + 1] = 0;
+	line_buffer[i + 1] = 0;
 	return (left_c);
 }
 

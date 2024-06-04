@@ -1,16 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ibravo-m <ibravo-m@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/28 15:18:32 by ibravo-m          #+#    #+#             */
-/*   Updated: 2024/06/04 10:33:02 by ibravo-m         ###   ########.fr       */
+/*   Created: 2024/06/04 10:56:54 by ibravo-m          #+#    #+#             */
+/*   Updated: 2024/06/04 10:58:46 by ibravo-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+
+#include "get_next_line_bonus.h"
 
 char	*ft_strdup(char *s)
 {
